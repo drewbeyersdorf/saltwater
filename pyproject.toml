@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "saltwater-harness"
+version = "0.1.0"
+description = "An agentic orchestration harness transcribed from the developmental biology of Crocodylus porosus."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "The Saltwater Collective" }]
+keywords = ["agents", "orchestration", "deployment", "staging", "consensus"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/drewbeyersdorf/saltwater"
+Repository = "https://github.com/drewbeyersdorf/saltwater"
+
+[tool.setuptools.packages.find]
+include = ["saltwater*"]
