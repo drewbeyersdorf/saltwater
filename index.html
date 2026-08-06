@@ -1,1 +1,653 @@
-PLACEHOLDER_SITE
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CULTUS — The Animal That Teaches Deployment</title>
+<meta name="description" content="A saltwater crocodile raises its young in five careful stages. CULTUS raises AI agents the same way. Scroll the story.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --abyss:#040d0b; --tank:#071410; --tank-2:#0a1c16;
+    --ivory:#ece5d3; --ink-dim:#a3a08d;
+    --brass:#c9a35a; --gill:#63cdb8; --violet:#9b8fc9; --spore:#c97a5a;
+    --hair:rgba(236,229,211,.13);
+    --ease:cubic-bezier(.2,.6,0,1);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--abyss);color:var(--ivory);
+    font-family:'Cormorant Garamond',serif;font-weight:300;
+    -webkit-font-smoothing:antialiased;overflow-x:hidden}
+  ::selection{background:var(--gill);color:var(--abyss)}
+
+  #caustics{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5}
+  #vignette{position:fixed;inset:0;z-index:1;pointer-events:none;
+    background:radial-gradient(ellipse 120% 90% at 50% 0%, transparent 40%, rgba(2,7,6,.55) 100%)}
+
+  #veil{position:fixed;inset:0;z-index:100;background:var(--abyss);
+    display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1.5rem;
+    transition:opacity 1.6s var(--ease), visibility 1.6s}
+  #veil.lifted{opacity:0;visibility:hidden}
+  #veil .coat{font-family:'IBM Plex Mono',monospace;font-size:.56rem;letter-spacing:.55em;
+    color:var(--brass);text-transform:uppercase}
+  #veil .word{font-family:'Fraunces',serif;font-weight:200;
+    font-size:clamp(1.6rem,4vw,2.6rem);letter-spacing:.5em;color:var(--ivory)}
+  #veil .def{font-style:italic;font-size:clamp(.95rem,1.5vw,1.15rem);
+    color:var(--ink-dim);max-width:26em;text-align:center;line-height:1.7}
+  #veil .bar{width:130px;height:1px;background:var(--hair);position:relative;overflow:hidden}
+  #veil .bar i{position:absolute;inset:0;background:var(--gill);
+    transform:translateX(-100%);animation:fill 2.6s var(--ease) forwards}
+  @keyframes fill{to{transform:translateX(0)}}
+
+  header{position:fixed;top:0;left:0;right:0;z-index:50;
+    display:flex;justify-content:space-between;align-items:center;
+    padding:1.7rem 3rem;mix-blend-mode:difference;pointer-events:none}
+  header .mark{font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.5em;
+    color:#fff;text-transform:uppercase}
+  header .mark b{color:var(--gill);font-weight:400}
+  header .room-no{font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.38em;color:#fff}
+  #dotnav{position:fixed;right:1.5rem;top:50%;transform:translateY(-50%);z-index:50;
+    display:flex;flex-direction:column;gap:1rem}
+  #dotnav a{width:8px;height:8px;border:1px solid var(--ink-dim);
+    clip-path:polygon(0 1px,1px 0,100% 0,100% calc(100% - 1px),calc(100% - 1px) 100%,0 100%);
+    transition:background .6s var(--ease),border-color .6s}
+  #dotnav a.on{background:var(--brass);border-color:var(--brass)}
+
+  .room{min-height:100vh;position:relative;display:flex;flex-direction:column;
+    justify-content:center;padding:15vh 7vw 13vh;overflow:hidden;z-index:2}
+  .room + .room{border-top:1px solid var(--hair)}
+  .ghost{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    font-family:'Fraunces',serif;font-weight:900;font-stretch:75%;
+    font-size:clamp(6rem,24vw,26rem);line-height:.8;letter-spacing:-.02em;
+    color:transparent;-webkit-text-stroke:1px rgba(236,229,211,.06);
+    white-space:nowrap;pointer-events:none;user-select:none;z-index:0}
+  .plate{position:relative;z-index:2;opacity:0;transform:translateY(50px);
+    transition:opacity 1.7s var(--ease),transform 1.7s var(--ease)}
+  .room.seen .plate{opacity:1;transform:none}
+  .plate.d2{transition-delay:.3s}.plate.d3{transition-delay:.6s}
+
+  .kicker{font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.5em;
+    text-transform:uppercase;color:var(--gill);margin-bottom:2.2rem;
+    display:flex;align-items:center;gap:1.2rem}
+  .kicker::before{content:"";width:36px;height:1px;background:var(--gill)}
+  .kicker.brass{color:var(--brass)}.kicker.brass::before{background:var(--brass)}
+
+  h1.display,h2.display{font-family:'Fraunces',serif;font-weight:250;
+    font-variation-settings:'opsz' 144;line-height:.95;letter-spacing:-.015em}
+  h1.display{font-size:clamp(3rem,10vw,9.5rem);letter-spacing:.04em}
+  h2.display{font-size:clamp(2.4rem,6.4vw,5.8rem)}
+  .display em{font-style:italic;font-weight:150;color:var(--brass)}
+
+  .wall-text{font-size:clamp(1.3rem,2vw,1.7rem);line-height:1.55;max-width:32em}
+  .wall-text em{font-style:italic;color:var(--brass)}
+  .wall-text .dim{color:var(--ink-dim)}
+
+  .label{font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.28em;
+    text-transform:uppercase;color:var(--ink-dim);line-height:2.1}
+  .label b{color:var(--ivory);font-weight:400}
+
+  #room-hero{justify-content:flex-end;padding-bottom:11vh}
+  #bubbles{position:absolute;inset:0;z-index:1;pointer-events:none}
+  .standfirst{font-size:clamp(1.2rem,1.8vw,1.55rem);font-style:italic;
+    color:var(--ink-dim);max-width:28em;margin-top:2.4rem}
+  .standfirst b{color:var(--ivory);font-weight:400}
+  .hero-meta{display:flex;gap:3.6rem;flex-wrap:wrap;margin-top:3.5rem;
+    padding-top:1.6rem;border-top:1px solid var(--hair)}
+  .cue{position:absolute;bottom:2.6rem;left:50%;transform:translateX(-50%);z-index:3;
+    font-family:'IBM Plex Mono',monospace;font-size:.54rem;letter-spacing:.5em;
+    text-transform:uppercase;color:var(--ink-dim);
+    display:flex;flex-direction:column;align-items:center;gap:.9rem}
+  .cue::after{content:"";width:1px;height:42px;
+    background:linear-gradient(var(--ink-dim),transparent);
+    animation:drip 3.6s var(--ease) infinite}
+  @keyframes drip{0%{transform:scaleY(0);transform-origin:top}
+    55%{transform:scaleY(1);transform-origin:top}
+    56%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+  .interlude .wall-text{font-size:clamp(1.6rem,2.9vw,2.6rem);line-height:1.45;max-width:23em}
+
+  .chapter{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);
+    gap:clamp(2.5rem,5.5vw,6.5rem);align-items:center;position:relative;z-index:2}
+  .chapter.flip{grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr)}
+  .chapter.flip .art{order:2}
+  @media(max-width:920px){.chapter,.chapter.flip{grid-template-columns:1fr}
+    .chapter.flip .art{order:0}}
+
+  .art{position:relative}
+  .art figure{position:relative;border:1px solid var(--hair);padding:.8rem;background:var(--tank);
+    transition:border-color .8s var(--ease)}
+  .art figure::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:2;
+    background:radial-gradient(ellipse 90% 60% at 50% 0%, rgba(236,229,211,.09), transparent 60%);
+    opacity:0;transition:opacity 1s var(--ease)}
+  .art:hover figure{border-color:rgba(201,163,90,.5)}
+  .art:hover figure::before{opacity:1}
+  .art img{width:100%;display:block;filter:saturate(.92)}
+  .art figcaption{display:flex;justify-content:space-between;gap:1rem;
+    padding-top:1rem;font-family:'IBM Plex Mono',monospace;font-size:.54rem;
+    letter-spacing:.28em;text-transform:uppercase;color:var(--ink-dim)}
+  .art figcaption b{color:var(--brass);font-weight:400}
+
+  .story .step{font-family:'IBM Plex Mono',monospace;font-size:.58rem;
+    letter-spacing:.5em;text-transform:uppercase;color:var(--gill);margin-bottom:1.6rem;
+    display:flex;align-items:center;gap:1.2rem}
+  .story .step::before{content:"";width:28px;height:1px;background:var(--gill)}
+  .story h3{font-family:'Fraunces',serif;font-weight:300;
+    font-size:clamp(2rem,4.6vw,3.8rem);line-height:1;margin-bottom:1.8rem}
+  .story h3 em{font-style:italic;font-weight:150;color:var(--brass)}
+  .story .told{font-size:clamp(1.15rem,1.7vw,1.45rem);line-height:1.62;max-width:26em}
+  .story .told em{font-style:italic;color:var(--brass)}
+  .story .told .dim{color:var(--ink-dim)}
+  .story .plain{margin-top:1.6rem;padding-left:1.4rem;position:relative;
+    font-style:italic;font-size:clamp(1.05rem,1.5vw,1.25rem);line-height:1.6;
+    color:var(--gill);max-width:24em}
+  .story .plain::before{content:"";position:absolute;left:0;top:.35em;bottom:.35em;
+    width:1px;background:var(--gill);opacity:.5}
+  .story .plain span{display:block;font-style:normal;
+    font-family:'IBM Plex Mono',monospace;font-size:.54rem;letter-spacing:.4em;
+    text-transform:uppercase;color:var(--ink-dim);margin-bottom:.6rem}
+
+  .peek{margin-top:2.4rem}
+  .peek button{all:unset;cursor:pointer;
+    font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.4em;
+    text-transform:uppercase;color:var(--brass);
+    display:inline-flex;align-items:center;gap:1rem;
+    border-bottom:1px dotted rgba(201,163,90,.5);padding-bottom:.5rem;
+    transition:color .5s,letter-spacing .6s var(--ease)}
+  .peek button:hover{color:var(--ivory);letter-spacing:.46em}
+  .peek button .chev{display:inline-block;transition:transform .6s var(--ease)}
+  .peek.open button .chev{transform:rotate(90deg)}
+  .peek .codebox{max-height:0;overflow:hidden;opacity:0;
+    transition:max-height 1.1s var(--ease),opacity .9s var(--ease),margin 1.1s var(--ease)}
+  .peek.open .codebox{max-height:520px;opacity:1;margin-top:1.8rem}
+  .accession{background:var(--tank);border:1px solid var(--hair);position:relative;
+    padding:1.9rem 1.9rem 1.6rem;
+    clip-path:polygon(0 10px,10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%)}
+  .accession .tag{position:absolute;top:-1px;right:1.6rem;background:var(--gill);color:var(--abyss);
+    font-family:'IBM Plex Mono',monospace;font-size:.52rem;
+    letter-spacing:.3em;padding:.4rem .8rem .3rem;text-transform:uppercase}
+  .accession pre{font-family:'IBM Plex Mono',monospace;font-weight:300;
+    font-size:clamp(.62rem,.88vw,.74rem);line-height:1.8;overflow-x:auto;white-space:pre}
+  .accession pre .kw{color:var(--gill)}
+  .accession pre .st{color:var(--brass)}
+  .accession pre .cm{color:var(--ink-dim);font-style:italic}
+  .accession .caption{margin-top:1.2rem;padding-top:1rem;
+    border-top:1px dotted var(--hair);font-family:'IBM Plex Mono',monospace;
+    font-size:.54rem;letter-spacing:.26em;text-transform:uppercase;color:var(--ink-dim)}
+  .accession .caption b{color:var(--gill);font-weight:400}
+
+  .wings{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:1px;background:var(--hair);border:1px solid var(--hair);
+    position:relative;z-index:2;margin-top:3.5rem}
+  .wing{background:var(--abyss);padding:2.4rem 2.2rem;transition:background .8s var(--ease)}
+  .wing:hover{background:var(--tank-2)}
+  .wing .no{font-family:'IBM Plex Mono',monospace;font-size:.56rem;
+    letter-spacing:.4em;text-transform:uppercase}
+  .wing.w-or .no{color:var(--violet)} .wing.w-hy .no{color:var(--spore)} .wing.w-mw .no{color:var(--brass)}
+  .wing h3{font-family:'Fraunces',serif;font-weight:300;font-size:1.6rem;margin:.9rem 0 1rem}
+  .wing h3 em{font-style:italic;font-weight:150}
+  .wing.w-or h3 em{color:var(--violet)} .wing.w-hy h3 em{color:var(--spore)} .wing.w-mw h3 em{color:var(--brass)}
+  .wing p{font-size:1rem;line-height:1.6;font-style:italic;color:var(--ink-dim)}
+  .wing .trail{margin-top:1.4rem;padding-top:1rem;border-top:1px dotted var(--hair);
+    font-family:'IBM Plex Mono',monospace;font-size:.54rem;letter-spacing:.3em;
+    text-transform:uppercase;color:var(--ink-dim)}
+
+  .dl{display:flex;flex-wrap:wrap;gap:1.3rem;margin-top:3.4rem;position:relative;z-index:2}
+  .dl a{font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.32em;
+    text-transform:uppercase;color:var(--ivory);text-decoration:none;
+    border:1px solid var(--hair);padding:1.1rem 1.8rem;position:relative;
+    overflow:hidden;transition:color .6s var(--ease),border-color .6s}
+  .dl a::before{content:"";position:absolute;inset:0;background:var(--gill);
+    transform:translateY(101%);transition:transform .6s var(--ease);z-index:-1}
+  .dl a:hover{color:var(--abyss);border-color:var(--gill)}
+  .dl a:hover::before{transform:translateY(0)}
+  footer{display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem;
+    padding:2.2rem 7vw;border-top:1px solid var(--hair);
+    font-family:'IBM Plex Mono',monospace;font-size:.54rem;letter-spacing:.3em;
+    text-transform:uppercase;color:var(--ink-dim);position:relative;z-index:2}
+  footer em{color:var(--brass);font-style:normal}
+</style>
+</head>
+<body>
+
+<canvas id="caustics"></canvas>
+<div id="vignette"></div>
+
+<div id="veil">
+  <div class="coat">A House of Harnesses · By Appointment</div>
+  <div class="word">CULTUS</div>
+  <div class="def">Latin, n. — cultivation, as of a field; worship, as of a god;
+  care, as of a living thing. One word for all three.</div>
+  <div class="bar"><i></i></div>
+</div>
+
+<header>
+  <div class="mark">CVLT<b>VS</b> · HOUSE OF HARNESSES</div>
+  <div class="room-no" id="roomNo">THE HOUSE</div>
+</header>
+<nav id="dotnav" aria-label="Journey"></nav>
+
+<!-- ═══════ 00 · THE HOUSE ═══════ -->
+<section class="room" id="room-hero" data-name="THE HOUSE">
+  <canvas id="bubbles"></canvas>
+  <div class="ghost">CVLTVS</div>
+  <div style="position:relative;z-index:2">
+    <div class="plate">
+      <div class="kicker brass">One animal · one harness · five lessons</div>
+      <h1 class="display">CULTUS</h1>
+      <p class="standfirst">The saltwater crocodile has raised its babies the same way
+      for <b>two hundred million years</b> — carefully, in stages, letting go at the end.
+      CULTUS is a harness that raises <b>AI agents the exact same way.</b>
+      Scroll, and watch the animal teach the machine.</p>
+    </div>
+    <div class="plate d3 hero-meta">
+      <div class="label">The teacher<br><b>Crocodylus porosus</b><br>Saltwater crocodile</div>
+      <div class="label">The student<br><b>SALTWATER v0.1.0</b><br>An agent orchestration harness</div>
+      <div class="label">The lesson plan<br><b>5 stages</b><br>Nest → Open Water</div>
+      <div class="label">Reading time<br><b>One scroll</b><br>No prerequisites</div>
+    </div>
+  </div>
+  <div class="cue">Begin the descent</div>
+</section>
+
+<!-- ═══════ 01 · THE IDEA ═══════ -->
+<section class="room interlude" id="room-idea" data-name="THE IDEA">
+  <div class="ghost">WHY</div>
+  <div class="plate">
+    <div class="kicker">The idea, in one breath</div>
+    <p class="wall-text">Launching an AI agent straight onto the open internet is
+    like throwing a baby crocodile into the open ocean. <em>It is not ready.</em>
+    <span class="dim">The crocodile solved this problem before dinosaurs went extinct:
+    raise the young in five careful stages. CULTUS simply copied the homework.</span></p>
+  </div>
+</section>
+
+<!-- ═══════ 02 · SCALE: THE TANK ═══════ -->
+<section class="room" id="room-tank" data-name="FIRST, THE ANIMAL">
+  <div class="ghost">SCALE</div>
+  <div class="chapter">
+    <div class="art plate">
+      <figure><img src="https://www.kimi.com/apiv2-files/sign-obj/kimi-fs%2Ffiles%2Fblob%2F5c6c63ebbc6b19ce8655f88928a107a501c04a5fb02872c2ad6bdd0dc75d88e7?filename=the-tank.jpg&sig=PUHWQ-5MRn13TyOQ6lUv9WOIfaBMspIBA62Ex_UkmH0=&t=o" alt="A saltwater crocodile suspended in a vast dark aquarium, a lone visitor watching"></figure>
+      <figcaption><b>CAT. 01</b><span>The Resident Tank · the patron's aquarium</span></figcaption>
+    </div>
+    <div class="story plate d2">
+      <div class="step">First — meet the teacher</div>
+      <h3>The largest reptile<br>on <em>Earth.</em></h3>
+      <p class="told">Seven metres long. A bite stronger than a lion's, a tiger's,
+      and a shark's — <em>combined.</em> And yet, with its babies, it is one of the most
+      careful parents in the animal kingdom. <span class="dim">That contrast —
+      terrifying power, infinite tenderness — is the entire design philosophy
+      of the harness you are about to read.</span></p>
+      <p class="plain"><span>In plain words</span>
+      Strong enough to crush anything. Gentle enough to carry a baby in its teeth.
+      Good infrastructure should feel exactly like that.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ 03 · STAGE I: NEST ═══════ -->
+<section class="room" id="room-nest" data-name="STAGE 1 · NEST">
+  <div class="ghost">NEST</div>
+  <div class="chapter flip">
+    <div class="art plate">
+      <figure><img src="https://www.kimi.com/apiv2-files/sign-obj/kimi-fs%2Ffiles%2Fblob%2Ff8e218cc386543c569b3b488c77130672f51e6dc06ce178d33614414881f0851?filename=the-nest.jpg&sig=-LKKfqfv3JWgpG1X362TNXvkJds5m4b620tUTiaCxCA=&t=o" alt="Crocodile eggs in a steaming mound nest, one hatching in moonlight"></figure>
+      <figcaption><b>CAT. 02</b><span>The Nest · oil study, moonrise</span></figcaption>
+    </div>
+    <div class="story plate d2">
+      <div class="step">Stage 1 of 5 · The Nest</div>
+      <h3>Where you grow up<br>decides <em>what you become.</em></h3>
+      <p class="told">A crocodile nest is a compost heap that warms itself.
+      The temperature of that mound decides whether each egg hatches male or female —
+      <em>the nest literally designs its babies.</em> SALTWATER does the same with agents:
+      their environment is chosen first, and it shapes everything they become.</p>
+      <p class="plain"><span>In plain words</span>
+      An agent's settings aren't a form it fills in later. They're the womb it grows in.
+      Get the environment right before the agent ever wakes up.</p>
+      <div class="peek">
+        <button type="button">See the harness code <span class="chev">→</span></button>
+        <div class="codebox">
+          <div class="accession">
+            <div class="tag">SW-01</div>
+<pre><span class="cm"># nest/config.py — the womb comes first</span>
+<span class="kw">from</span> saltwater <span class="kw">import</span> Nest
+
+nest = Nest(
+    medium=<span class="st">"estuarine"</span>,        <span class="cm"># where it grows up</span>
+    temperature=<span class="st">31.6</span>,          <span class="cm"># decides its traits</span>
+    guardrails=<span class="kw">True</span>,
+)
+
+<span class="kw">with</span> nest.incubate() <span class="kw">as</span> env:
+    agent = env.clutch(<span class="st">"harvester-07"</span>)  <span class="cm"># born already shaped</span></pre>
+            <div class="caption">Acquisition <b>nest/config.py</b> · environment as womb</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ 04 · STAGE II: VOCALIZE ═══════ -->
+<section class="room" id="room-vocalize" data-name="STAGE 2 · VOCALIZE">
+  <div class="ghost">CALL</div>
+  <div class="chapter">
+    <div class="art plate">
+      <figure><img src="https://www.kimi.com/apiv2-files/sign-obj/kimi-fs%2Ffiles%2Fblob%2F72283263927f10e8a8646f38aa857411719fe9e51447593dd07ce1eda27b987c?filename=banner.jpg&sig=BlOAnXtm1iL8MNUHMrn6wEES5NSCF2Q6G0BzUex4dmk=&t=o" alt="Chiaroscuro portrait of a crocodile gliding beneath dark water, amber on the armor"></figure>
+      <figcaption><b>CAT. 03</b><span>Portrait of the Resident · the amber hour</span></figcaption>
+    </div>
+    <div class="story plate d2">
+      <div class="step">Stage 2 of 5 · The Vocalize</div>
+      <h3>They agree to be born<br><em>together.</em></h3>
+      <p class="told">Hours before hatching, the babies start calling
+      <em>from inside their eggs</em> — and the calls spread, egg to egg, until the whole
+      clutch hatches in the same hour. Nobody comes out alone into a dangerous world.
+      SALTWATER agents do this too: before a group of agents launches, they check
+      each other's readiness and emerge <em>all at once, or not at all.</em></p>
+      <p class="plain"><span>In plain words</span>
+      It's a headcount before the big moment. If your launch depends on ten agents
+      and only seven are ready, the crocodile says: wait.</p>
+      <div class="peek">
+        <button type="button">See the harness code <span class="chev">→</span></button>
+        <div class="codebox">
+          <div class="accession">
+            <div class="tag">SW-02</div>
+<pre><span class="cm"># vocalize/consensus.py — hatch together or not at all</span>
+<span class="kw">from</span> saltwater <span class="kw">import</span> Vocalize
+
+round = Vocalize(clutch=agents, quorum=<span class="st">0.75</span>)
+
+<span class="kw">async</span> <span class="kw">with</span> round.listen() <span class="kw">as</span> chorus:
+    <span class="kw">await</span> chorus.until_ready(timeout=<span class="st">"30s"</span>)
+    <span class="kw">await</span> chorus.hatch()   <span class="cm"># all, or none</span></pre>
+            <div class="caption">Acquisition <b>vocalize/consensus.py</b> · nobody emerges alone</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ 05 · STAGE III: TRANSPORT ═══════ -->
+<section class="room" id="room-transport" data-name="STAGE 3 · TRANSPORT">
+  <div class="ghost">JAWS</div>
+  <div class="chapter flip">
+    <div class="art plate">
+      <figure><img src="https://www.kimi.com/apiv2-files/sign-obj/kimi-fs%2Ffiles%2Fblob%2F54a997a04c38766d2b16e7ee0348e6256c61d904c8d8565d27e3cb1200436ca8?filename=the-cradle.jpg&sig=ndraM3E9c-zr391MeGxbL3hC0fJ6zTNUtiA0SuHNJ28=&t=o" alt="A mother crocodile carrying a hatchling gently in her open jaws"></figure>
+      <figcaption><b>CAT. 04</b><span>The Cradle · jaws as vehicle</span></figcaption>
+    </div>
+    <div class="story plate d2">
+      <div class="step">Stage 3 of 5 · The Transport</div>
+      <h3>The deadliest mouth on Earth<br>becomes a <em>cradle.</em></h3>
+      <p class="told">The mother scoops her hatchlings into her jaws — the same jaws that
+      crush buffalo — and carries them through mud, roots and predators to safe water,
+      <em>without leaving a scratch.</em> SALTWATER moves young agents the same way:
+      the most powerful, highest-privilege part of the system escorts the fragile new
+      agents across the dangerous parts of the network — then lets go.</p>
+      <p class="plain"><span>In plain words</span>
+      Power isn't for showing off; it's for carrying fragile things safely.
+      Your strongest systems should escort your weakest ones.</p>
+      <div class="peek">
+        <button type="button">See the harness code <span class="chev">→</span></button>
+        <div class="codebox">
+          <div class="accession">
+            <div class="tag">SW-03</div>
+<pre><span class="cm"># transport/maternal.py — jaws as vehicle</span>
+<span class="kw">from</span> saltwater <span class="kw">import</span> Transport
+
+escort = Transport.jaws(
+    route=[<span class="st">"nest"</span>, <span class="st">"bank"</span>, <span class="st">"shallows"</span>],
+    bite_pressure=<span class="st">0.0</span>,   <span class="cm"># maximal strength, zero harm</span>
+)
+
+<span class="kw">await</span> escort.carry(agents).release_at(<span class="st">"estuary"</span>)</pre>
+            <div class="caption">Acquisition <b>transport/maternal.py</b> · power in service of fragility</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ 06 · STAGE IV: ESTUARY ═══════ -->
+<section class="room" id="room-estuary" data-name="STAGE 4 · ESTUARY">
+  <div class="ghost">NURSERY</div>
+  <div class="chapter">
+    <div class="art plate">
+      <figure><img src="https://www.kimi.com/apiv2-files/sign-obj/kimi-fs%2Ffiles%2Fblob%2Fb758170ddc350cc348ad090126ad6cb58a00abbeb501b9a9fdaefcde6c58add7?filename=plate-study.jpg&sig=knTmlYmho97Po4j9NQqrhE7s4fsKY06pfOtAG9CihtA=&t=o" alt="Engraved natural history plate of Crocodylus porosus"></figure>
+      <figcaption><b>CAT. 05</b><span>Tabula Anatomica · from the house folio</span></figcaption>
+    </div>
+    <div class="story plate d2">
+      <div class="step">Stage 4 of 5 · The Estuary</div>
+      <h3>Practice in water that's real —<br>but <em>fenced.</em></h3>
+      <p class="told">The young crocodiles grow up in an estuary: real fish, real currents,
+      real stakes — but no sharks, because the open ocean can't get in.
+      <em>A training ground that's honest but survivable.</em> SALTWATER's staging works
+      the same: agents handle real traffic inside fences that block anything
+      irreversible — and the fences fade, one by one, as the agent proves itself.</p>
+      <p class="plain"><span>In plain words</span>
+      A sandbox that lies teaches nothing. Let agents practice on the real thing,
+      behind guardrails that quietly disappear as they earn it.</p>
+      <div class="peek">
+        <button type="button">See the harness code <span class="chev">→</span></button>
+        <div class="codebox">
+          <div class="accession">
+            <div class="tag">SW-04</div>
+<pre><span class="cm"># estuary/nursery.py — a true ocean, fenced</span>
+<span class="kw">from</span> saltwater <span class="kw">import</span> Estuary
+
+nursery = Estuary(
+    live_traffic=<span class="kw">True</span>,              <span class="cm"># real stakes</span>
+    fence=[<span class="st">"irreversible_writes"</span>],   <span class="cm"># honest, not fatal</span>
+)
+
+nursery.fade(policy=<span class="st">"demonstrated_competence"</span>)</pre>
+            <div class="caption">Acquisition <b>estuary/nursery.py</b> · safety that knows how to leave</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ 07 · STAGE V: OPEN WATER ═══════ -->
+<section class="room" id="room-openwater" data-name="STAGE 5 · OPEN WATER">
+  <div class="ghost">RELEASE</div>
+  <div class="chapter flip">
+    <div class="art plate">
+      <figure><img src="https://www.kimi.com/apiv2-files/sign-obj/kimi-fs%2Ffiles%2Fblob%2F5c6c63ebbc6b19ce8655f88928a107a501c04a5fb02872c2ad6bdd0dc75d88e7?filename=the-tank.jpg&sig=PUHWQ-5MRn13TyOQ6lUv9WOIfaBMspIBA62Ex_UkmH0=&t=o" alt="A crocodile suspended in vast open dark water"></figure>
+      <figcaption><b>CAT. 06</b><span>Open Water · she swims away</span></figcaption>
+    </div>
+    <div class="story plate">
+      <div class="step">Stage 5 of 5 · Open Water</div>
+      <h3>Then she swims away —<br>and that <em>is</em> the care.</h3>
+      <p class="told">When the young are ready, the mother leaves. Not because she stops
+      caring — because a crocodile that never hunts alone never becomes a crocodile.
+      <em>The whole five-stage journey exists to make the leaving safe.</em>
+      SALTWATER releases agents the same way: full freedom, granted piece by piece,
+      exactly as fast as competence is proven — and not one heartbeat faster.</p>
+      <p class="plain"><span>In plain words</span>
+      An agent that needs its guardrails forever wasn't raised — it was stored.
+      The goal of every safety system is the day it's no longer needed.</p>
+      <div class="peek">
+        <button type="button">See the harness code <span class="chev">→</span></button>
+        <div class="codebox">
+          <div class="accession">
+            <div class="tag">SW-05</div>
+<pre><span class="cm"># open_water/release.py — graduated abandonment</span>
+<span class="kw">from</span> saltwater <span class="kw">import</span> OpenWater
+
+sea = OpenWater(agents)
+
+<span class="kw">async for</span> j <span class="kw">in</span> sea.graduate(metric=<span class="st">"competence"</span>):
+    <span class="kw">if</span> j.thrives():
+        sea.withdraw(j)   <span class="cm"># it hunts alone now.</span>
+                          <span class="cm"># that was the point.</span></pre>
+            <div class="caption">Acquisition <b>open_water/release.py</b> · the reward for good guardrails is their absence</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ 08 · RECAP ═══════ -->
+<section class="room interlude" id="room-recap" data-name="THE WHOLE JOURNEY">
+  <div class="ghost">FIVE</div>
+  <div class="plate">
+    <div class="kicker brass">The whole journey, memorized in one breath</div>
+    <p class="wall-text"><em>Nest</em> — grow them in the right environment.<br>
+    <em>Vocalize</em> — emerge together, or not at all.<br>
+    <em>Transport</em> — let power carry fragility.<br>
+    <em>Estuary</em> — practice for real, behind fading fences.<br>
+    <em>Open Water</em> — let go when they've earned it.
+    <span class="dim"> That's it. That's the animal. That's the harness.</span></p>
+  </div>
+</section>
+
+<!-- ═══════ 09 · OTHER WINGS ═══════ -->
+<section class="room" id="room-wings" data-name="MORE TEACHERS">
+  <div class="ghost">WINGS</div>
+  <div class="plate">
+    <div class="kicker">The crocodile is not the only teacher</div>
+    <h2 class="display">Three more wings<br>are still being <em>copied.</em></h2>
+    <p class="wall-text" style="font-size:clamp(1.1rem,1.6vw,1.35rem);margin-top:2rem">
+    <span class="dim">CULTUS transcribes harnesses from any discipline that raised things
+    well before software existed. Biology was first. These are next — each sealed
+    until its copying is complete.</span></p>
+  </div>
+  <div class="plate d2 wings">
+    <div class="wing w-or">
+      <div class="no">Wing II · Theology · Sealed</div>
+      <h3>OR<em>DO</em></h3>
+      <p>The church never deployed a soul — it ordained one, through rites with
+      eligibility, examination and witnesses. An agent's path to production,
+      treated as liturgy: formation, conferral, penance, restoration.</p>
+      <div class="trail">Vocation → Catechumenate → Ordination → Penance → Beatification</div>
+    </div>
+    <div class="wing w-hy">
+      <div class="no">Wing III · Mycology · Sealed</div>
+      <h3>HY<em>PHAE</em></h3>
+      <p>A fungus has no center and loses nothing: one living network, sharing signal
+      and nutrient, raising temporary fruiting bodies for a single task and dissolving
+      them without grief. The swarm harness.</p>
+      <div class="trail">Inoculate → Colonize → Quorum → Fruit → Sporulate</div>
+    </div>
+    <div class="wing w-mw">
+      <div class="no">Wing IV · Guildcraft · Sealed</div>
+      <h3>MASTER<em>WORK</em></h3>
+      <p>The guilds knew competence is proven by a work, not a title: years of
+      indenture, a wandering journeyman period, one judged masterpiece — then,
+      and only then, the rank.</p>
+      <div class="trail">Indenture → Journeyman → Masterpiece → Guild → Retirement</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ 10 · ACQUISITION ═══════ -->
+<section class="room" id="room-exit" data-name="TAKE IT HOME">
+  <div class="ghost">TAKE ONE</div>
+  <div class="plate">
+    <div class="kicker brass">Acquisition desk</div>
+    <h2 class="display">Take the <em>animal</em><br>home with you.</h2>
+    <div class="dl">
+      <a href="https://github.com/drewbeyersdorf/saltwater">The Repository · github.com/drewbeyersdorf/saltwater</a>
+      <a href="https://github.com/drewbeyersdorf/saltwater/blob/main/README.md">Field Notes · README</a>
+      <a href="https://github.com/drewbeyersdorf/saltwater/blob/main/examples/simple_agent.py">Live Specimen · Demo</a>
+      <a href="https://github.com/drewbeyersdorf/saltwater/archive/refs/heads/main.zip">The Whole Animal · .zip</a>
+    </div>
+    <div class="plate d3" style="margin-top:4rem;max-width:36rem">
+      <p class="wall-text" style="font-size:1.15rem"><span class="dim">The code is open,
+      the story is yours, and the next three wings open as their copying completes.
+      When your agents finally swim beyond your fences, remember which animal
+      taught you to let go.</span></p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>CULTUS · A House of Harnesses</span>
+  <span>Wing I: <em>SALTWATER</em> open · II–IV sealed</span>
+  <span>Cultus: cultivation, worship, care — one word for all three</span>
+</footer>
+
+<script>
+/* ── caustic light ─────────────────────────────────────────── */
+const cc = document.getElementById('caustics'), cg = cc.getContext('2d');
+let CW, CH;
+function csize(){ CW = cc.width = innerWidth; CH = cc.height = innerHeight; }
+csize(); addEventListener('resize', csize);
+(function caustic(t){
+  cg.clearRect(0,0,CW,CH);
+  for (let i=0;i<7;i++){
+    const x = CW*(.1+.8*((Math.sin(t/9000+i*2.4)+1)/2));
+    const y = CH*.15 + i*CH*.11 + Math.sin(t/7000+i)*30;
+    const r = 180 + 90*Math.sin(t/5000+i*1.7);
+    const g = cg.createRadialGradient(x,y,0,x,y,r);
+    g.addColorStop(0,'rgba(99,205,184,.028)');
+    g.addColorStop(1,'rgba(99,205,184,0)');
+    cg.fillStyle = g;
+    cg.beginPath(); cg.ellipse(x,y,r*1.8,r*.5,Math.sin(i)*.4,0,7); cg.fill();
+  }
+  requestAnimationFrame(caustic);
+})(0);
+
+/* ── bubbles ────────────────────────────────────────────────── */
+const bv = document.getElementById('bubbles'), bg = bv.getContext('2d');
+let BW, BH, bl = [];
+function bsize(){ BW = bv.width = bv.offsetWidth; BH = bv.height = bv.offsetHeight;
+  bl = Array.from({length: Math.min(60, BW/18)}, () => ({
+    x: Math.random()*BW, y: BH + Math.random()*BH,
+    r: Math.random()*2 + .5, v: Math.random()*.35 + .12,
+    w: Math.random()*.6 + .2, ph: Math.random()*7
+  }));
+}
+bsize(); addEventListener('resize', bsize);
+(function rise(t){
+  bg.clearRect(0,0,BW,BH);
+  for (const b of bl){
+    b.y -= b.v; b.x += Math.sin(t/1600 + b.ph)*b.w*.3;
+    if (b.y < -8){ b.y = BH + 8; b.x = Math.random()*BW; }
+    bg.beginPath(); bg.arc(b.x, b.y, b.r, 0, 7);
+    bg.strokeStyle = 'rgba(99,205,184,.22)'; bg.stroke();
+  }
+  requestAnimationFrame(rise);
+})(0);
+
+/* ── reveal-the-code accordions ─────────────────────────────── */
+document.querySelectorAll('.peek').forEach(p => {
+  p.querySelector('button').addEventListener('click', () => {
+    p.classList.toggle('open');
+    p.querySelector('button').firstChild.textContent =
+      p.classList.contains('open') ? 'Hide the harness code ' : 'See the harness code ';
+  });
+});
+
+/* ── room observation ───────────────────────────────────────── */
+const rooms = [...document.querySelectorAll('.room')];
+const nav = document.getElementById('dotnav');
+const roomNo = document.getElementById('roomNo');
+rooms.forEach(r => {
+  const a = document.createElement('a');
+  a.href = '#' + r.id; a.title = r.dataset.name;
+  nav.appendChild(a);
+});
+const dots = [...nav.children];
+const io = new IntersectionObserver(es => es.forEach(e => {
+  if (e.isIntersecting){
+    e.target.classList.add('seen');
+    const i = rooms.indexOf(e.target);
+    dots.forEach((d,j) => d.classList.toggle('on', j === i));
+    roomNo.textContent = e.target.dataset.name;
+  }
+}), {threshold:.42});
+rooms.forEach(r => io.observe(r));
+
+/* ── veil ───────────────────────────────────────────────────── */
+addEventListener('load', () => setTimeout(() =>
+  document.getElementById('veil').classList.add('lifted'), 2600));
+setTimeout(() => document.getElementById('veil').classList.add('lifted'), 4600);
+</script>
+</body>
+</html>
