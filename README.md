@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://www.kimi.com/apiv2-files/sign-obj/kimi-fs%2Ffiles%2Fblob%2F72283263927f10e8a8646f38aa857411719fe9e51447593dd07ce1eda27b987c?filename=banner.jpg&sig=BlOAnXtm1iL8MNUHMrn6wEES5NSCF2Q6G0BzUex4dmk=&t=o" alt="SALTWATER — a saltwater crocodile gliding beneath dark water, lit amber from above" width="100%">
+</p>
+
 # SALTWATER
 
 **An agentic orchestration harness transcribed from the developmental biology of *Crocodylus porosus*.**
