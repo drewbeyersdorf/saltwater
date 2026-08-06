@@ -71,6 +71,10 @@ A runnable version of this — with the field notes printed — lives at [`examp
 
 ## The five stages
 
+<p align="center">
+  <img src="https://www.kimi.com/apiv2-files/sign-obj/kimi-fs%2Ffiles%2Fblob%2Ff8e218cc386543c569b3b488c77130672f51e6dc06ce178d33614414881f0851?filename=the-nest.jpg&sig=-LKKfqfv3JWgpG1X362TNXvkJds5m4b620tUTiaCxCA=&t=o" alt="The Nest — eggs in the steaming mound, one hatching in moonlight" width="82%">
+</p>
+
 ### I · Nest — *environment-as-configuration*
 
 A crocodile nest is a compost heap that warms itself, and its temperature decides the sex of every egg inside. The nest doesn't advise its babies; it **designs** them. SALTWATER's `Nest` works the same way: the environment is declared and validated *before* any agent exists, and every hatchling carries its imprint.
@@ -82,13 +86,25 @@ A crocodile nest is a compost heap that warms itself, and its temperature decide
 
 Hours before hatching, embryos call from inside their shells, and the calls synchronize the clutch: **they emerge together or not at all.** `Vocalize` gathers readiness calls from a group of agents and refuses to `hatch()` below quorum. If your launch needs ten agents and seven are ready — the crocodile says wait.
 
+<p align="center">
+  <img src="https://www.kimi.com/apiv2-files/sign-obj/kimi-fs%2Ffiles%2Fblob%2F54a997a04c38766d2b16e7ee0348e6256c61d904c8d8565d27e3cb1200436ca8?filename=the-cradle.jpg&sig=ndraM3E9c-zr391MeGxbL3hC0fJ6zTNUtiA0SuHNJ28=&t=o" alt="The Cradle — the mother carries a hatchling in her open jaws" width="82%">
+</p>
+
 ### III · Transport — *power in service of fragility*
 
 The mother carries hatchlings in her jaws — the same jaws that crush buffalo — and doesn't leave a scratch. `Transport.jaws()` moves freshly hatched agents across hostile topology along a **pre-declared route** (the mother does not improvise with lives in her mouth), verifies every leg, and sets them down at safe water. `bite_pressure` must be `0.0`. That is not a joke; it is an invariant.
 
+<p align="center">
+  <img src="https://www.kimi.com/apiv2-files/sign-obj/kimi-fs%2Ffiles%2Fblob%2Fb758170ddc350cc348ad090126ad6cb58a00abbeb501b9a9fdaefcde6c58add7?filename=plate-study.jpg&sig=knTmlYmho97Po4j9NQqrhE7s4fsKY06pfOtAG9CihtA=&t=o" alt="Tabula Anatomica — the engraved study of Crocodylus porosus from the house folio" width="82%">
+</p>
+
 ### IV · Estuary — *a true ocean, fenced*
 
 The nursery has real prey and real current, but no sharks. `Estuary` puts agents on live traffic inside fences (`irreversible_writes`, `open_ocean`) that block the unforgivable mistakes — and `fade()` drops those fences **per agent, by demonstrated competence only**, never by calendar. Failures are recorded as `scars`: data, not shame.
+
+<p align="center">
+  <img src="https://www.kimi.com/apiv2-files/sign-obj/kimi-fs%2Ffiles%2Fblob%2F5c6c63ebbc6b19ce8655f88928a107a501c04a5fb02872c2ad6bdd0dc75d88e7?filename=the-tank.jpg&sig=PUHWQ-5MRn13TyOQ6lUv9WOIfaBMspIBA62Ex_UkmH0=&t=o" alt="Open Water — the crocodile swims in vast dark water beyond the glass" width="82%">
+</p>
 
 ### V · Open Water — *graduated abandonment*
 
@@ -176,6 +192,7 @@ saltwater/
   open_water/release.py  Stage V   — graduated abandonment
 examples/simple_agent.py one full lifecycle, mound to ocean
 tests/test_lifecycle.py  the field notes, verified
+art/                     the paintings hung in this README (original works of the house)
 ```
 
 ## Lineage
