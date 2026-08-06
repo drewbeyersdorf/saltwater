@@ -17,6 +17,9 @@ transcribed from the developmental biology of *Crocodylus porosus*.
   for training, a thrive score for release; identical for local (`sovereign`)
   and cloud (`pelagic`) agents, `estuarine` hybrid by default
 - **`examples/simple_agent.py`** — a full three-agent lifecycle, mound to ocean
+- **`examples/clutch_of_scrapers.py`** — the real-life application: a clutch of
+  research agents raised against live HTTP services (`/health`, `/canary`),
+  nest to open water, in ~40 lines
 - **12-test suite** — `python -m unittest discover tests -v`
 - **Original artwork** — banner plus four stage paintings hung through the README
 - **MIT licensed** — the protocol is two hundred million years old and belongs
